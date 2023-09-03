@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  firstname  String
+  lastname   String
+  email      String   @unique
+  phone      String   @unique
+  password   String
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  Ride       Ride[]
+
+  @@map("users")
+}
+
+model Driver {
+  id           Int      @id @default(autoincrement())
+  firstname    String
+  lastname     String
+  email        String   @unique
+  phone        String   @unique
+  password     String
+  is_available Boolean  @default(true)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @default(now())
+  Ride         Ride[]
+
+  @@map("drivers")
+}
+
+model Ride {
+  id        Int     @id @default(autoincrement())
+  user_id   Int
+  user      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  driver_id Int?
+  driver    Driver? @relation(fields: [driver_id], references: [id], onDelete: Cascade)
+  latitute  Float
+  longitude Float
+  status    Status  @default(pending)
+
+  @@map("rides")
+}
+
+enum Status {
+  pending
+  accepted
+  completed
+  canceled
+}
