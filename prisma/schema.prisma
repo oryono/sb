@@ -45,8 +45,8 @@ model Ride {
   user      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
   driver_id Int?
   driver    Driver? @relation(fields: [driver_id], references: [id], onDelete: Cascade)
-  latitute  Float
-  longitude Float
+  from      String
+  to        String
   status    Status  @default(pending)
 
   @@map("rides")
