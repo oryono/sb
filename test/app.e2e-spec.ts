@@ -144,7 +144,7 @@ describe('AppController (e2e)', () => {
             email: 'test', //wrong email
             password: 'password',
           };
-          const response = await request(app.getHttpServer())
+          await request(app.getHttpServer())
             .post('/auth/user/register')
             .send(body)
             .expect(400);
@@ -164,7 +164,7 @@ describe('AppController (e2e)', () => {
             phone: '1234567891',
             password: 'password',
           };
-          const response = await request(app.getHttpServer())
+          await request(app.getHttpServer())
             .post('/auth/driver/register')
             .send(body)
             .expect(201);
@@ -180,6 +180,9 @@ describe('AppController (e2e)', () => {
             .post('/auth/driver/register')
             .send(body)
             .expect(400);
+
+          expect(response.body).toHaveProperty('message');
+          expect(Array.isArray(response.body.message)).toBe(true);
         });
       });
     });
@@ -206,7 +209,7 @@ describe('AppController (e2e)', () => {
           },
         });
 
-        const driver = await prisma.driver.create({
+        await prisma.driver.create({
           data: {
             firstname: 'John',
             lastname: 'Doe',
