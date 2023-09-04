@@ -5,6 +5,7 @@ import {
   Param,
   ParseIntPipe,
   Put,
+  Req,
 } from '@nestjs/common';
 import { RideService } from './ride.service';
 import { UpdateDto } from './dto';
@@ -19,9 +20,8 @@ export class RideController {
   }
 
   @Put(':id/accept')
-  accept(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateDto) {
-    console.log(body);
-    return this.rideService.accept(id, body);
+  accept(@Param('id', ParseIntPipe) id: number, @Req() request: Request) {
+    return this.rideService.accept(id, request['auth'].id);
   }
 
   @Put(':id/complete')

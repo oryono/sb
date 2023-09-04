@@ -5,7 +5,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { UpdateDto } from './dto';
 
 @Injectable()
 export class RideService {
@@ -15,15 +14,39 @@ export class RideService {
     return this.prisma.ride.findMany();
   }
 
-  async accept(rideId: number, data: UpdateDto) {
+  async accept(rideId: number, driverId: number) {
+    // Check if ride is accepted. Can only accept rides that are pending
+    // Find ride
+    const ride = await this.prisma.ride.findFirst({
+      where: {
+        id: rideId,
+      },
+    });
+
+    // Make sure ride exists
+    if (!ride) {
+      throw new NotFoundException('Ride is not found');
+    }
+
+    // Make sure ride is pending state. We can only accept pending rides
+    if (
+      ride.status == 'accepted' ||
+      ride.status == 'completed' ||
+      ride.status == 'canceled'
+    ) {
+      throw new BadRequestException(
+        'Ride is either accepted, canceled or has not been completed by driver',
+      );
+    }
+
     const driver = await this.prisma.driver.findFirst({
       where: {
-        id: data.driverId,
+        id: driverId,
       },
     });
 
     if (!driver) {
-      throw new BadRequestException('Driver not found');
+      throw new NotFoundException('Driver not found');
     }
 
     if (!driver.is_available) {
@@ -39,7 +62,7 @@ export class RideService {
 
           data: {
             status: 'accepted',
-            driver_id: data.driverId,
+            driver_id: driverId,
           },
         });
 
@@ -112,7 +135,7 @@ export class RideService {
 
       return { message: 'Ride completed' };
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   }
 
@@ -166,7 +189,7 @@ export class RideService {
 
       return { message: 'Ride canceled' };
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   }
 }

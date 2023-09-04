@@ -110,7 +110,7 @@ export class AuthService {
         expiresIn: '2h',
         secret: process.env.JWT_SECRET,
       }),
-      user: payload,
+      driver: payload,
     };
   }
 }
